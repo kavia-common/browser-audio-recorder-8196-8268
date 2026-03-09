@@ -1,0 +1,4 @@
+{
+    "command": "./gradlew installDebug",
+    "working_directory": "/home/kavia/workspace/code-generation/browser-audio-recorder-8196-8268/voice_record_and_play_frontend"
+}
