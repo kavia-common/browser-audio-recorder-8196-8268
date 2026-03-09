@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Ocean Recorder</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="app-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-text">
+            <div class="brand-title">Ocean Recorder</div>
+            <div class="brand-subtitle">Record, playback, and manage your session</div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="btnClearAll" class="btn btn-ghost" type="button" title="Clear session recordings">
+            Clear all
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="container main">
+      <section class="hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+
+        <div class="card recorder-card">
+          <div class="card-header">
+            <div>
+              <h1 class="h1">Recorder</h1>
+              <p class="muted">
+                Uses your browser microphone via <code>MediaRecorder</code>.
+              </p>
+            </div>
+
+            <div class="status-pill" id="statusPill" aria-live="polite">
+              <span class="dot" id="statusDot" aria-hidden="true"></span>
+              <span id="statusText">Idle</span>
+              <span class="divider" aria-hidden="true"></span>
+              <span class="mono" id="timerText">00:00</span>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="btnStart" class="btn btn-primary" type="button">
+              Start recording
+            </button>
+
+            <button id="btnStop" class="btn btn-danger" type="button" disabled>
+              Stop
+            </button>
+
+            <button id="btnSave" class="btn btn-secondary" type="button" disabled>
+              Save to session
+            </button>
+
+            <div class="spacer"></div>
+
+            <button id="btnToggleMonitor" class="btn btn-ghost" type="button" disabled>
+              Enable monitor
+            </button>
+          </div>
+
+          <div class="playback">
+            <div class="playback-header">
+              <h2 class="h2">Instant playback</h2>
+              <p class="muted">
+                Your last recording is available here immediately after you stop.
+              </p>
+            </div>
+
+            <div class="audio-wrap">
+              <audio id="audioPreview" controls preload="metadata"></audio>
+              <div class="audio-meta">
+                <div class="mono" id="previewMeta">No recording yet</div>
+              </div>
+            </div>
+
+            <div class="note" id="supportNote" role="note">
+              <strong>Tip:</strong> For best results, use a Chromium-based browser (Chrome/Edge).
+            </div>
+          </div>
+        </div>
+
+        <aside class="card session-card" aria-label="Session recordings">
+          <div class="card-header">
+            <div>
+              <h2 class="h2">Session recordings</h2>
+              <p class="muted" id="sessionSummary">0 recordings</p>
+            </div>
+          </div>
+
+          <div id="recordingsEmpty" class="empty">
+            <div class="empty-title">Nothing saved yet</div>
+            <div class="empty-subtitle">
+              Record audio and press <span class="kbd">Save to session</span>.
+            </div>
+          </div>
+
+          <ul id="recordingsList" class="recordings" aria-live="polite"></ul>
+        </aside>
+      </section>
+
+      <section class="footer">
+        <div class="footer-inner">
+          <div class="muted">
+            Audio stays in your browser memory for this session (no backend).
+          </div>
+          <div class="muted">
+            Ocean Professional theme: <span class="swatch primary"></span> #2563EB
+            <span class="swatch secondary"></span> #F59E0B
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <template id="recordingItemTemplate">
+      <li class="rec-item">
+        <div class="rec-main">
+          <div class="rec-title-row">
+            <div class="rec-title"></div>
+            <div class="rec-badges">
+              <span class="badge badge-blue">Saved</span>
+            </div>
+          </div>
+          <div class="rec-meta mono"></div>
+          <audio class="rec-audio" controls preload="metadata"></audio>
+        </div>
+
+        <div class="rec-actions">
+          <button class="btn btn-ghost btn-sm rec-download" type="button">Download</button>
+          <button class="btn btn-ghost btn-sm rec-delete" type="button">Delete</button>
+        </div>
+      </li>
+    </template>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
