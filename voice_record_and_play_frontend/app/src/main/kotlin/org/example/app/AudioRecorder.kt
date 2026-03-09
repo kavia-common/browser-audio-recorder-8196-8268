@@ -101,7 +101,20 @@ internal class AudioRecorder(
     fun stop() {
         if (!isRecording.get()) return
         isRecording.set(false)
-        // Thread will stop after loop; no busy wait here.
+
+        // Wait briefly for the writer to finalize and close the WAV file so callers can safely
+        // read/play the file immediately after stop().
+        //
+        // This is important for the UX requirement: "stop -> save to wav -> auto play".
+        // If we don't join, MediaPlayer may attempt to read a header that hasn't been finalized yet.
+        val t = thread
+        if (t != null && t.isAlive) {
+            try {
+                t.join(1500) // small bounded wait to avoid UI hangs
+            } catch (_: InterruptedException) {
+                // If interrupted, just return; file will still finalize asynchronously.
+            }
+        }
     }
 
     fun isRecording(): Boolean = isRecording.get()

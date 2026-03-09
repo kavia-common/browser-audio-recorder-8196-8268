@@ -70,6 +70,8 @@ class MainActivity : FragmentActivity() {
 
         btnStart.setOnClickListener { ensurePermissionAndStartRecording() }
         btnStop.setOnClickListener { stopRecording() }
+
+        // Keep the button and behavior for compatibility, but the main flow now auto-saves on stop.
         btnSave.setOnClickListener { saveLastRecording() }
 
         btnPlay.setOnClickListener { playSelected() }
@@ -132,6 +134,9 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun stopRecording() {
+        val outFile = currentOutputFile
+
+        // Stop recording and wait (bounded) for WAV finalization (header + close).
         recorder?.stop()
         recorder = null
 
@@ -139,21 +144,43 @@ class MainActivity : FragmentActivity() {
         btnStart.isEnabled = true
         btnStop.isEnabled = false
 
-        // Enable save only if file exists and has some data.
-        val f = currentOutputFile
-        btnSave.isEnabled = f != null && f.exists() && f.length() > 44 // header only is 44 bytes
+        // New desired flow: Stop => file is already saved as WAV (we record directly into the final file)
+        // and we immediately refresh the persisted list and auto-play the newest recording.
+        //
+        // Keep existing persisted recordings list behavior: list is refreshed from storage.
+        if (outFile != null && outFile.exists() && outFile.length() > 44) {
+            // Saving is implicit now; disable to avoid duplicate "save" actions.
+            btnSave.isEnabled = false
+
+            // Refresh persisted recordings list and focus newest.
+            refreshRecordings(focusFirst = true)
+
+            // Select newest and play immediately.
+            val newest = RecordingRepository.listRecordings(this).firstOrNull()
+            if (newest != null) {
+                selectedRecording = newest
+                updateNowPlaying(newest)
+                updatePlaybackButtons()
+                playSelected()
+            }
+        } else {
+            // Nothing valid recorded.
+            btnSave.isEnabled = false
+            updatePlaybackButtons()
+        }
     }
 
     private fun saveLastRecording() {
-        // We already record directly into the final file inside internal storage, so "Save"
-        // just refreshes list and locks the save button to avoid duplicates.
+        // Legacy/manual behavior: we already record directly into the final WAV file inside internal storage,
+        // so "Save" just refreshes the persisted list and locks the save button to avoid duplicates.
         val f = currentOutputFile
-        if (f == null || !f.exists()) return
+        if (f == null || !f.exists() || f.length() <= 44) return
 
         btnSave.isEnabled = false
         refreshRecordings(focusFirst = true)
 
-        // After saving, auto-select the newest for quick playback.
+        // After saving, auto-select the newest for quick playback (but do not auto-play here;
+        // Stop already does that in the new flow).
         val first = RecordingRepository.listRecordings(this).firstOrNull()
         if (first != null) {
             selectedRecording = first
