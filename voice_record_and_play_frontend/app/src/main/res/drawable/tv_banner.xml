@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Simple banner placeholder for Android TV home screen.
+         A real app would typically use a branded 320x180 image. -->
+    <solid android:color="#2563EB" />
+</shape>
